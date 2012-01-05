@@ -18,7 +18,7 @@
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-	define('ENVIRONMENT', 'development');
+	define('ENVIRONMENT', 'development'); // defined：定义常量。在这里设定开发环境
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
@@ -28,17 +28,17 @@
  * By default development will show errors but testing and live will hide them.
  */
 
-if (defined('ENVIRONMENT'))
+if (defined('ENVIRONMENT')) //defined:检查某常量是否存在。 若常量存在，则返回true，否则返回false。
 {
 	switch (ENVIRONMENT)
 	{
 		case 'development':
-			error_reporting(E_ALL);
+			error_reporting(E_ALL); // error_reporting() 设置 PHP 的报错级别并返回当前级别。参考文档：http://www.w3school.com.cn/php/func_error_reporting.asp
 		break;
 	
 		case 'testing':
 		case 'production':
-			error_reporting(0);
+			error_reporting(0); // 生产环境关闭错误提示
 		break;
 
 		default:
@@ -134,13 +134,13 @@ if (defined('ENVIRONMENT'))
  * ---------------------------------------------------------------
  */
 
-	// Set the current directory correctly for CLI requests
+	// Set the current directory correctly for CLI request 命令行执行
 	if (defined('STDIN'))
 	{
-		chdir(dirname(__FILE__));
+		chdir(dirname(__FILE__)); // chdir:函数把当前的目录改变为指定的目录 dirname:返回路径中的目录部分 __FILE__:返回当前执行PHP脚本的完整路径和文件名,包含一个绝对路径
 	}
 
-	if (realpath($system_path) !== FALSE)
+	if (realpath($system_path) !== FALSE) // realpath:返回绝对路径
 	{
 		$system_path = realpath($system_path).'/';
 	}
@@ -149,8 +149,8 @@ if (defined('ENVIRONMENT'))
 	$system_path = rtrim($system_path, '/').'/';
 
 	// Is the system path correct?
-	if ( ! is_dir($system_path))
-	{
+	if ( ! is_dir($system_path)) // is_dir:检查指定的文件是否是目录
+	{ // pathinfo:以数组的形式返回文件路径的信息。PATHINFO_DIRNAME - 只返回 dirname(目录名) PATHINFO_BASENAME - 只返回 basename(文件名) PATHINFO_EXTENSION - 只返回 extension(扩展名)
 		exit("Your system folder path does not appear to be set correctly. Please open the following file and correct this: ".pathinfo(__FILE__, PATHINFO_BASENAME));
 	}
 
@@ -166,17 +166,20 @@ if (defined('ENVIRONMENT'))
 	// this global constant is deprecated.
 	define('EXT', '.php');
 
-	// Path to the system folder
+	// Path to the system folder  str_replace：使用一个字符串替换字符串中的另一些字符。
 	define('BASEPATH', str_replace("\\", "/", $system_path));
 
 	// Path to the front controller (this file)
 	define('FCPATH', str_replace(SELF, '', __FILE__));
 
 	// Name of the "system folder"
+	// trim：从字符串的两端删除空白字符和其他预定义字符。
+	// strrchr： 函数查找字符串在另一个字符串中最后一次出现的位置，并返回从该位置到字符串结尾的所有字符。如果成失败，否则返回 false。
+	
 	define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
 
 
-	// The path to the "application" folder
+	// The path to the "application" folder 如果应用目录存在（先判断根目录是否存在，然后判断CI框架system目录）则定义APPPATH常量，不存在直接报错退出
 	if (is_dir($application_folder))
 	{
 		define('APPPATH', $application_folder.'/');
