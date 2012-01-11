@@ -33,7 +33,7 @@
  * @var string
  *
  */
-	define('CI_VERSION', '2.1.0');
+	define('CI_VERSION', '2.1.0'); // 定义CI版本
 
 /**
  * CodeIgniter Branch (Core = TRUE, Reactor = FALSE)
@@ -48,7 +48,7 @@
  *  Load the global functions
  * ------------------------------------------------------
  */
-	require(BASEPATH.'core/Common.php');
+	require(BASEPATH.'core/Common.php'); // 加载全局函数
 
 /*
  * ------------------------------------------------------
@@ -57,7 +57,7 @@
  */
 	if (defined('ENVIRONMENT') AND file_exists(APPPATH.'config/'.ENVIRONMENT.'/constants.php'))
 	{
-		require(APPPATH.'config/'.ENVIRONMENT.'/constants.php');
+		require(APPPATH.'config/'.ENVIRONMENT.'/constants.php'); // 加载CI定义的常量
 	}
 	else
 	{
@@ -69,16 +69,16 @@
  *  Define a custom error handler so we can log PHP errors
  * ------------------------------------------------------
  */
-	set_error_handler('_exception_handler');
+	set_error_handler('_exception_handler'); // set_error_handler:设置用户自定义的错误处理函数函数详解看：http://www.w3school.com.cn/php/func_error_set_error_handler.asp
 
 	if ( ! is_php('5.3'))
 	{
-		@set_magic_quotes_runtime(0); // Kill magic quotes
+		@set_magic_quotes_runtime(0); // Kill magic quotes 自PHP 5.3.0 起，已经废弃此函数。在这里表示关闭自动转义。
 	}
 
 /*
  * ------------------------------------------------------
- *  Set the subclass_prefix
+ *  Set the subclass_prefix 设置子类的前缀
  * ------------------------------------------------------
  *
  * Normally the "subclass_prefix" is set in the config file.
@@ -104,7 +104,7 @@
  */
 	if (function_exists("set_time_limit") == TRUE AND @ini_get("safe_mode") == 0)
 	{
-		@set_time_limit(300);
+		@set_time_limit(300); // set_time_limit:设置PHP执行时间，默认为30  如果为0则永久执行
 	}
 
 /*
@@ -112,8 +112,8 @@
  *  Start the timer... tick tock tick tock...
  * ------------------------------------------------------
  */
-	$BM =& load_class('Benchmark', 'core');
-	$BM->mark('total_execution_time_start');
+	$BM =& load_class('Benchmark', 'core'); // 加载基准测试类
+	$BM->mark('total_execution_time_start'); 
 	$BM->mark('loading_time:_base_classes_start');
 
 /*
