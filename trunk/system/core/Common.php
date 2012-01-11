@@ -39,15 +39,15 @@
 * @param	string
 * @return	bool	TRUE if the current version is $version or higher
 */
-if ( ! function_exists('is_php'))
+if ( ! function_exists('is_php')) // function_exists:检查函数是否已定义
 {
 	function is_php($version = '5.0.0')
 	{
-		static $_is_php;
-		$version = (string)$version;
+		static $_is_php; // static:静态化变量，函数运行之后该值的值不会消失下次直接调用。
+		$version = (string)$version; // (string):把版本号转换成字符串
 
-		if ( ! isset($_is_php[$version]))
-		{
+		if ( ! isset($_is_php[$version])) // isset:检测是否已设置,如果已设置返回TRUE，反之返回FALSE。
+		{ // version_compare:PHP版本比较函数，第一个参数的值大于第二个参数返回１反之返回０　 PHP_VERSION：返回当前PHP版本号的常量
 			$_is_php[$version] = (version_compare(PHP_VERSION, $version) < 0) ? FALSE : TRUE;
 		}
 
@@ -71,34 +71,34 @@ if ( ! function_exists('is_really_writable'))
 {
 	function is_really_writable($file)
 	{
-		// If we're on a Unix server with safe_mode off we call is_writable
+		// If we're on a Unix server with safe_mode off we call is_writable　ini_get：获取PHP系统配置
 		if (DIRECTORY_SEPARATOR == '/' AND @ini_get("safe_mode") == FALSE)
-		{
+		{ // is_writable:函数判断指定的文件是否可写。
 			return is_writable($file);
 		}
 
 		// For windows servers and safe_mode "on" installations we'll actually
 		// write a file then read it.  Bah...
-		if (is_dir($file))
-		{
+		if (is_dir($file)) // is_dir: 函数检查指定的文件是否是目录
+		{ // rtrim：如果是目录去除目标右侧的正斜线 md5:计算字符串的MD5 散列 mt_rand:使用Mersenne Twister 算法返回随机整数
 			$file = rtrim($file, '/').'/'.md5(mt_rand(1,100).mt_rand(1,100));
-
+			// fopen:打开文件或者URL,FOPEN_WRITE_CREATE是CI定义的常量 = ab 在application/config/constants.php可以查看
 			if (($fp = @fopen($file, FOPEN_WRITE_CREATE)) === FALSE)
 			{
 				return FALSE;
 			}
 
-			fclose($fp);
-			@chmod($file, DIR_WRITE_MODE);
-			@unlink($file);
+			fclose($fp); // fclose:关闭一个打开文件
+			@chmod($file, DIR_WRITE_MODE); // chmod:函数改变文件模式 @:抑制错误输出
+			@unlink($file); // unlink:删除文件
 			return TRUE;
-		}
+		} // is_file:检查指定的文件名是否是正常的文件
 		elseif ( ! is_file($file) OR ($fp = @fopen($file, FOPEN_WRITE_CREATE)) === FALSE)
 		{
 			return FALSE;
 		}
 
-		fclose($fp);
+		fclose($fp); // 同上
 		return TRUE;
 	}
 }
@@ -136,13 +136,15 @@ if ( ! function_exists('load_class'))
 		// then in the native system/libraries folder
 		foreach (array(APPPATH, BASEPATH) as $path)
 		{
-			if (file_exists($path.$directory.'/'.$class.'.php'))
+			if (file_exists($path.$directory.'/'.$class.'.php')) // file_exists:检查文件或目录是否存在
 			{
 				$name = $prefix.$class;
 
-				if (class_exists($name) === FALSE)
+				if (class_exists($name) === FALSE) // class_exists: php:检查PHP类是否存在
 				{
-					require($path.$directory.'/'.$class.'.php');
+				/*	通过 include() 或 require() 函数，您可以在服务器执行 PHP 文件之前在该文件中插入一个文件的内容。除了它们处理错误的方式不同之外，这两个函数在其他方面都是相同的。
+					include() 函数会生成一个警告（但是脚本会继续执行），而 require() 函数会生成一个致命错误（fatal error）（在错误发生后脚本会停止执行）。*/
+					require($path.$directory.'/'.$class.'.php');  // 加载CI系统类
 				}
 
 				break;
@@ -156,11 +158,11 @@ if ( ! function_exists('load_class'))
 
 			if (class_exists($name) === FALSE)
 			{
-				require(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.'.php');
+				require(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.'.php'); // 加载用户自定义类
 			}
 		}
 
-		// Did we find the class?
+		// Did we find the class? 如果指定的类文件不存在系统会报错
 		if ($name === FALSE)
 		{
 			// Note: We use exit() rather then show_error() in order to avoid a
@@ -169,10 +171,10 @@ if ( ! function_exists('load_class'))
 		}
 
 		// Keep track of what we just loaded
-		is_loaded($class);
+		is_loaded($class); // 记录加载过的类
 
-		$_classes[$class] = new $name();
-		return $_classes[$class];
+		$_classes[$class] = new $name(); // 实例化加载类并且把结果存放在$_classes里
+		return $_classes[$class]; // return： 返回结果
 	}
 }
 
@@ -193,7 +195,7 @@ if ( ! function_exists('is_loaded'))
 
 		if ($class != '')
 		{
-			$_is_loaded[strtolower($class)] = $class;
+			$_is_loaded[strtolower($class)] = $class; // strtolower:转换为小定字母
 		}
 
 		return $_is_loaded;
@@ -203,7 +205,7 @@ if ( ! function_exists('is_loaded'))
 // ------------------------------------------------------------------------
 
 /**
-* Loads the main config.php file
+* Loads the main config.php file 加载CI主配置文件
 *
 * This function lets us grab the config file even if the Config class
 * hasn't been instantiated yet
@@ -280,6 +282,7 @@ if ( ! function_exists('config_item'))
 			{
 				return FALSE;
 			}
+			
 			$_config_item[$item] = $config[$item];
 		}
 
@@ -305,7 +308,7 @@ if ( ! function_exists('show_error'))
 {
 	function show_error($message, $status_code = 500, $heading = 'An Error Was Encountered')
 	{
-		$_error =& load_class('Exceptions', 'core');
+		$_error =& load_class('Exceptions', 'core'); // 加载异常类
 		echo $_error->show_error($heading, $message, 'error_general', $status_code);
 		exit;
 	}
@@ -355,7 +358,7 @@ if ( ! function_exists('log_message'))
 			return;
 		}
 
-		$_log =& load_class('Log');
+		$_log =& load_class('Log'); // 加载日志类
 		$_log->write_log($level, $message, $php_error);
 	}
 }
@@ -363,7 +366,7 @@ if ( ! function_exists('log_message'))
 // ------------------------------------------------------------------------
 
 /**
- * Set HTTP Status Header
+ * Set HTTP Status Header 设置HTTP头
  *
  * @access	public
  * @param	int		the status code
@@ -416,7 +419,7 @@ if ( ! function_exists('set_status_header'))
 							505	=> 'HTTP Version Not Supported'
 						);
 
-		if ($code == '' OR ! is_numeric($code))
+		if ($code == '' OR ! is_numeric($code)) // is_numeric:检测变量是否为数字或数字字符串
 		{
 			show_error('Status codes must be numeric', 500);
 		}
@@ -430,9 +433,9 @@ if ( ! function_exists('set_status_header'))
 		{
 			show_error('No status text available.  Please check your status code number or supply your own message text.', 500);
 		}
-
+		// $_SERVER['SERVER_PROTOCOL'] 请求页面时通信协议的名称和版本
 		$server_protocol = (isset($_SERVER['SERVER_PROTOCOL'])) ? $_SERVER['SERVER_PROTOCOL'] : FALSE;
-
+		// php_sapi_name:返回一个描述PHP与WEB服务器接口的小写字符串，在CGI方式下返回"cgi"，在 mod_php 加载的Apache里面返回"apache"
 		if (substr(php_sapi_name(), 0, 3) == 'cgi')
 		{
 			header("Status: {$code} {$text}", TRUE);
@@ -478,7 +481,7 @@ if ( ! function_exists('_exception_handler'))
 			return;
 		}
 
-		$_error =& load_class('Exceptions', 'core');
+		$_error =& load_class('Exceptions', 'core');  // 加载异常类
 
 		// Should we display the error? We'll get the current error_reporting
 		// level and add its bits with the severity bits to find out.
@@ -500,7 +503,7 @@ if ( ! function_exists('_exception_handler'))
 // --------------------------------------------------------------------
 
 /**
- * Remove Invisible Characters
+ * Remove Invisible Characters 移除看不见的字符
  *
  * This prevents sandwiching null characters
  * between ascii characters, like Java\0script.
@@ -527,7 +530,7 @@ if ( ! function_exists('remove_invisible_characters'))
 		$non_displayables[] = '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S';	// 00-08, 11, 12, 14-31, 127
 
 		do
-		{
+		{// preg_replace:用于正则表达式的搜索和替换
 			$str = preg_replace($non_displayables, '', $str, -1, $count);
 		}
 		while ($count);
@@ -551,10 +554,10 @@ if ( ! function_exists('html_escape'))
 	{
 		if (is_array($var))
 		{
-			return array_map('html_escape', $var);
+			return array_map('html_escape', $var); // array_map:返回用户自定义函数作用后的数组。回调函数接受的参数数目应该和传递给 array_map() 函数的数组数目一致。
 		}
 		else
-		{
+		{// htmlspecialchars:把一些预定义的字符转换为HTML 实体 ENT_QUOTES:编码双引号和单引号 函数详解看：http://www.w3school.com.cn/php/func_string_htmlspecialchars.asp
 			return htmlspecialchars($var, ENT_QUOTES, config_item('charset'));
 		}
 	}
